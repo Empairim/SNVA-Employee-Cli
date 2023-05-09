@@ -1,6 +1,11 @@
 const Employee = require("./employee.js");
 const fs = require("fs");
 const os = require("os");
+let employees=[]
+
+  function allEmployee(){
+    return employees
+  }
 
 function saveEmployeeData(employee) {
   const homeDir = os.homedir();
@@ -41,35 +46,20 @@ function isValidEmail(email) {
   return regex.test(email);
 }
 
-function addEmployee(req, res, employees) {
-  let body = "";
-  req.on("data", (chunk) => {
-    body += chunk;
-  });
-
-  req.on("end", () => {
-    const { fullName, age, contact, email } = JSON.parse(body);
-
+function addEmployee(employee) {
+  console.log("Inside the add Employee",employee)
+    const { fullName, age, contact, email } = employee
+    //console.log( fullName, age, contact, email ,employee)
     if (!isValidName(fullName) || !isValidAge(age) || !isValidEmail(email)) {
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify({
-          error: "Invalid input. Please check the data provided.",
-        })
-      );
-      return;
+            
+      throw new Error(`Can not save invalid ${fullName} ${age} ${email} `);
     }
 
-    const id = employees.length + 1;
+    const id = (employees.length + 1);
     const newEmployee = new Employee(id, fullName, age, contact, email);
     employees.push(newEmployee);
     saveEmployeeData(newEmployee);
-
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({ message: `Employee with ID ${id} has been added.` })
-    );
-  });
+    return employees
 }
 
 module.exports = addEmployee;
