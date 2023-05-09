@@ -1,7 +1,6 @@
-import Employee from "./employee.js";
-
-import fs from "fs";
-import os from "os";
+const Employee = require("./employee.js");
+const fs = require("fs");
+const os = require("os");
 
 function saveEmployeeData(employee) {
   const homeDir = os.homedir();
@@ -42,41 +41,35 @@ function isValidEmail(email) {
   return regex.test(email);
 }
 
-function addEmployee(employees, rl, mainMenu) {
-  rl.question("Enter full name: ", (fullName) => {
-    if (!isValidName(fullName)) {
-      console.log("Invalid name. Please use only letters and spaces.");
-      mainMenu();
+function addEmployee(req, res, employees) {
+  let body = "";
+  req.on("data", (chunk) => {
+    body += chunk;
+  });
+
+  req.on("end", () => {
+    const { fullName, age, contact, email } = JSON.parse(body);
+
+    if (!isValidName(fullName) || !isValidAge(age) || !isValidEmail(email)) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          error: "Invalid input. Please check the data provided.",
+        })
+      );
       return;
     }
 
-    rl.question("Enter age: ", (age) => {
-      if (!isValidAge(age)) {
-        console.log("Invalid age. Please enter a number between 18 and 99.");
-        mainMenu();
-        return;
-      }
+    const id = employees.length + 1;
+    const newEmployee = new Employee(id, fullName, age, contact, email);
+    employees.push(newEmployee);
+    saveEmployeeData(newEmployee);
 
-      rl.question("Enter contact: ", (contact) => {
-        rl.question("Enter email: ", (email) => {
-          if (!isValidEmail(email)) {
-            console.log(
-              "Invalid email. Please ensure it contains the '@' symbol and ends with '.com'."
-            );
-            mainMenu();
-            return;
-          }
-
-          const id = employees.length + 1;
-          const newEmployee = new Employee(id, fullName, age, contact, email);
-          employees.push(newEmployee);
-          console.log(`Employee with ID ${id} has been added.`);
-          saveEmployeeData(newEmployee);
-          mainMenu();
-        });
-      });
-    });
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({ message: `Employee with ID ${id} has been added.` })
+    );
   });
 }
 
-export default addEmployee;
+module.exports = addEmployee;

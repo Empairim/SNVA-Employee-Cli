@@ -12,4 +12,4 @@ function viewAllEmployees(employees, mainMenu) {
   mainMenu();
 }
 
-export default viewAllEmployees;
+module.exports = viewAllEmployees;

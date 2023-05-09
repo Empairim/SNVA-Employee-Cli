@@ -14,4 +14,4 @@ function viewEmployeeByEmail(employees, rl, mainMenu) {
   });
 }
 
-export default viewEmployeeByEmail;
+module.exports = viewEmployeeByEmail;

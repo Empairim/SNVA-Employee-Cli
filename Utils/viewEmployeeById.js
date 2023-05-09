@@ -11,5 +11,4 @@ function viewEmployeeById(employees, rl, mainMenu) {
     mainMenu();
   });
 }
-
-export default viewEmployeeById;
+module.exports = viewEmployeeById;

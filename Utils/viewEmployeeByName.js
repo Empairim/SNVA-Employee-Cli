@@ -14,4 +14,4 @@ function viewEmployeeByName(employees, rl, mainMenu) {
   });
 }
 
-export default viewEmployeeByName;
+module.exports = viewEmployeeByName;
